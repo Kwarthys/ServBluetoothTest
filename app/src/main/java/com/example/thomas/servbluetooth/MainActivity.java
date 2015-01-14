@@ -3,6 +3,7 @@ package com.example.thomas.servbluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -124,9 +125,13 @@ public class MainActivity extends ActionBarActivity
     {
         BluetoothServerSocket tmp = null;
         try {
-            tmp = btAdapter.listenUsingRfcommWithServiceRecord("BluetoothTryHard", MY_UUID);
+            tmp = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
         } catch (IOException e) { tost("planté"); }
         servSocket = tmp;
+
+
+        new TestThread(servSocket);
+
     }
 
     private void initVariables()
