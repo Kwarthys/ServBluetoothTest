@@ -14,11 +14,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 //pwalpwalpwal
@@ -27,10 +30,19 @@ public class MainActivity extends ActionBarActivity
 {
     private UUID MY_UUID = UUID.fromString("35ab00d3-22c4-41a0-9aba-bf6ad3271bce");
     protected BluetoothServerSocket servSocket;
+    private OutputStreamWriter os;
+    private BluetoothSocket socket;
+    private boolean CONTINUE_READ_WRITE = true;
+
     protected Button bConnect = null;
     protected Button bDisconnect = null;
+    protected Button sendButton = null;
     protected BluetoothAdapter btAdapter;
     protected TextView logs = null;
+    protected EditText editSend = null;
+
+    protected LinearLayout send = null;
+    protected LinearLayout list = null;
 
     protected String address = "";
     protected String name = "";
@@ -65,6 +77,35 @@ public class MainActivity extends ActionBarActivity
             if(nouveau)
                 listFoundAdapter.add(newContent);
             tost("N'a trouvé " + remoteDevice.getName());
+        }
+    };
+
+    private Runnable writter = new Runnable() {
+
+        @Override
+        public void run() {
+            send.setVisibility(View.VISIBLE);
+            list.setVisibility(View.GONE);
+
+            sendButton = (Button)findViewById(R.id.sendButton);
+            editSend = (EditText)findViewById(R.id.editSend);
+
+            final String message = editSend.getText().toString();
+
+            sendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    try {
+                        os.write(message + "\n");
+                        os.flush();
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
     };
 
@@ -123,14 +164,12 @@ public class MainActivity extends ActionBarActivity
 
     private void startConnexion()
     {
-        BluetoothServerSocket tmp = null;
         try {
-            tmp = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
+            servSocket = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
+            socket = servSocket.accept();
+            os = new OutputStreamWriter(socket.getOutputStream());
+            new Thread(writter).start();
         } catch (IOException e) { tost("planté"); }
-        servSocket = tmp;
-
-
-        new TestThread(servSocket);
 
     }
 
@@ -142,6 +181,12 @@ public class MainActivity extends ActionBarActivity
         logs = (TextView)findViewById(R.id.textLog);
         bConnect.setVisibility(View.GONE);
         bDisconnect.setVisibility(View.GONE);
+
+        send = (LinearLayout)findViewById(R.id.layoutSend);
+        list = (LinearLayout)findViewById(R.id.layoutList);
+        list.setVisibility(View.VISIBLE);
+        send.setVisibility(View.GONE);
+
 
         listFoundAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         listViewFound = (ListView)findViewById(R.id.listViewFound);

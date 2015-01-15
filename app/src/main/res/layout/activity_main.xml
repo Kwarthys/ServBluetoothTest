@@ -38,7 +38,7 @@
         android:layout_below="@id/layoutButtons"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/layoutList2"
+        android:id="@+id/layoutList"
         android:orientation="vertical">
 
         <TextView
@@ -56,6 +56,27 @@
             android:background="#888">
 
         </ListView>
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_below="@id/layoutList"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/layoutSend"
+        android:orientation="vertical">
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:id="@+id/editSend"
+            android:inputType="text"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Envoyer"
+            android:id="@+id/sendButton"/>
 
 
     </LinearLayout>
