@@ -79,6 +79,7 @@ public class MainActivity extends ActionBarActivity
             if(nouveau)
                 listFoundAdapter.add(newContent);
             tost("N'a trouvé " + remoteDevice.getName());
+            Log.d(TAG,"Device Found");
         }
     };
 
@@ -93,6 +94,8 @@ public class MainActivity extends ActionBarActivity
                 Log.d(TAG,"servSocket Initiated");
                 socket = servSocket.accept();
                 Log.d(TAG,"socket initiated");
+                servSocket.close();
+                Log.d(TAG,"Servsocket Closed");
                 os = new OutputStreamWriter(socket.getOutputStream());
                 Log.d(TAG,"Output Stream Initiated");
                 new Thread(writter).start();
@@ -118,7 +121,18 @@ public class MainActivity extends ActionBarActivity
 
             Log.d(TAG,"Mise en place du listener");
 
-            sendButton.setOnClickListener(new View.OnClickListener() {
+            for(int i = 0; i<200; i++)
+            {
+                try {
+                    os.write(i + "\n");
+                    os.flush();
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            /*sendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
                 {
@@ -130,7 +144,7 @@ public class MainActivity extends ActionBarActivity
                         e.printStackTrace();
                     }
                 }
-            });
+            });*/
 
         }
     };
