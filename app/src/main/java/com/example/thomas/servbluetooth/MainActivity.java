@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class MainActivity extends ActionBarActivity
 {
     private UUID MY_UUID = UUID.fromString("35ab00d3-22c4-41a0-9aba-bf6ad3271bce");
+    private static final String TAG = MainActivity.class.getSimpleName();
     protected BluetoothServerSocket servSocket;
     private OutputStreamWriter os;
     private BluetoothSocket socket;
@@ -80,10 +82,30 @@ public class MainActivity extends ActionBarActivity
         }
     };
 
+    private Runnable connexion = new Runnable() {
+        @Override
+        public void run()
+        {
+
+            Log.d(TAG,"Run connexion");
+            try {
+                servSocket = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
+                Log.d(TAG,"servSocket Initiated");
+                socket = servSocket.accept();
+                Log.d(TAG,"socket initiated");
+                os = new OutputStreamWriter(socket.getOutputStream());
+                Log.d(TAG,"Output Stream Initiated");
+                new Thread(writter).start();
+            } catch (IOException e) { tost("planté"); }
+        }
+    };
+
     private Runnable writter = new Runnable() {
 
         @Override
         public void run() {
+
+            Log.d(TAG,"Start Writter");
             send.setVisibility(View.VISIBLE);
             list.setVisibility(View.GONE);
 
@@ -91,6 +113,9 @@ public class MainActivity extends ActionBarActivity
             editSend = (EditText)findViewById(R.id.editSend);
 
             final String message = editSend.getText().toString();
+
+
+            Log.d(TAG,"Mise en place du listener");
 
             sendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -157,20 +182,10 @@ public class MainActivity extends ActionBarActivity
                 name = leSplit[0];
                 address = leSplit[1];
                 logs.setText("this is a log :" + name + " + " + address);
-                startConnexion();
+                Log.d(TAG,"Avant connexion");
+                new Thread(connexion).start();
             }
         });
-    }
-
-    private void startConnexion()
-    {
-        try {
-            servSocket = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
-            socket = servSocket.accept();
-            os = new OutputStreamWriter(socket.getOutputStream());
-            new Thread(writter).start();
-        } catch (IOException e) { tost("planté"); }
-
     }
 
     private void initVariables()
