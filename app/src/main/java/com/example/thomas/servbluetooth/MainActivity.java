@@ -96,7 +96,8 @@ public class MainActivity extends ActionBarActivity
                 os = new OutputStreamWriter(socket.getOutputStream());
                 Log.d(TAG,"Output Stream Initiated");
                 new Thread(writter).start();
-            } catch (IOException e) { tost("planté"); }
+            } catch (IOException e) {
+                Log.d(TAG,"Exception levée"); }
         }
     };
 
@@ -147,6 +148,7 @@ public class MainActivity extends ActionBarActivity
 
     private void setUpUI()
     {
+        Log.d(TAG,"Setting UI");
         initVariables();
         refreshButtons();
 
@@ -215,6 +217,7 @@ public class MainActivity extends ActionBarActivity
 
     private void refreshButtons()
     {
+        Log.d(TAG,"Refreshing buttons");
 
         if(btAdapter.isEnabled())
         {
@@ -228,6 +231,7 @@ public class MainActivity extends ActionBarActivity
             bDisconnect.setVisibility(View.GONE);
             listViewFound.setVisibility(View.GONE);
         }
+        Log.d(TAG,"Buttons refreshed");
     }
 
     @Override
