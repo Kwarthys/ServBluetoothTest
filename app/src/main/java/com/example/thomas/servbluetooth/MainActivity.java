@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity
 {
-    private UUID MY_UUID = UUID.fromString("35ab00d3-22c4-41a0-9aba-bf6ad3271bce");
+    private UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String TAG = MainActivity.class.getSimpleName();
     protected BluetoothServerSocket servSocket;
     private OutputStreamWriter os;
@@ -275,6 +275,8 @@ public class MainActivity extends ActionBarActivity
 }
 
 //UUID 35ab00d3-22c4-41a0-9aba-bf6ad3271bce
+
+//UUID Blueterm 00001101-0000-1000-8000-00805F9B34FB
 
 //UUID d23a5tse-5e4f-zerg-5hg8-5g54g7e5r1g4 Fait main.
 
