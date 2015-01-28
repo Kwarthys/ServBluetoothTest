@@ -35,32 +35,8 @@
 
     </LinearLayout>
     <LinearLayout
+        android:gravity="center"
         android:layout_below="@id/layoutButtons"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/layoutList"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Found"
-            android:textColor="#fff"
-            android:textSize="30sp"/>
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/listViewFound"
-            android:background="#888">
-
-        </ListView>
-
-
-    </LinearLayout>
-    <LinearLayout
-        android:layout_below="@id/layoutList"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/layoutSend"
@@ -75,6 +51,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="@string/Envoyer"
             android:id="@+id/sendButton"/>
 

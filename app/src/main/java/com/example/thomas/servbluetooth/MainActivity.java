@@ -2,39 +2,33 @@ package com.example.thomas.servbluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.UUID;
 
 //pwalpwalpwal
 
 public class MainActivity extends ActionBarActivity
 {
-    private UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String TAG = MainActivity.class.getSimpleName();
-    protected BluetoothServerSocket servSocket;
-    private OutputStreamWriter os;
-    private BluetoothSocket socket;
-    private boolean CONTINUE_READ_WRITE = true;
+
+    public static final int SOCKET_CONNECTED = 4;
+    public static final int DATA_RECEIVED = 3;
+    private String data;
+
+    private ConnectionThread mBluetoothConnection = null;
 
     protected Button bConnect = null;
     protected Button bDisconnect = null;
@@ -44,13 +38,6 @@ public class MainActivity extends ActionBarActivity
     protected EditText editSend = null;
 
     protected LinearLayout send = null;
-    protected LinearLayout list = null;
-
-    protected String address = "";
-    protected String name = "";
-
-    protected ListView listViewFound;
-    protected ArrayAdapter<String> listFoundAdapter;
 
     protected BroadcastReceiver bluetoothState = new BroadcastReceiver() {
         @Override
@@ -65,87 +52,20 @@ public class MainActivity extends ActionBarActivity
         public void onReceive(Context context, Intent intent)
         {
             BluetoothDevice remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            String newContent = remoteDevice.getName() + "\n" + remoteDevice.getAddress();
-            int size = listFoundAdapter.getCount();
-            boolean nouveau = true;
-            for(int i = 0; i<size; i++)
-            {
-                String temp = listFoundAdapter.getItem(i);
-                if(temp.equals(newContent))
-                {
-                    nouveau = false;
-                }
-            }
-            if(nouveau)
-                listFoundAdapter.add(newContent);
             tost("N'a trouvé " + remoteDevice.getName());
-            Log.d(TAG,"Device Found");
+            Log.d(TAG, remoteDevice.getName() + " Found");
         }
     };
 
-    private Runnable connexion = new Runnable() {
+    public Handler mHandler = new Handler() {
         @Override
-        public void run()
+        public void handleMessage(Message msg)
         {
-
-            Log.d(TAG,"Run connexion");
-            try {
-                servSocket = btAdapter.listenUsingRfcommWithServiceRecord("ServBluetooth", MY_UUID);
-                Log.d(TAG,"servSocket Initiated");
-                socket = servSocket.accept();
-                Log.d(TAG,"socket initiated");
-                servSocket.close();
-                Log.d(TAG,"Servsocket Closed");
-                os = new OutputStreamWriter(socket.getOutputStream());
-                Log.d(TAG,"Output Stream Initiated");
-                new Thread(writter).start();
-            } catch (IOException e) {
-                Log.d(TAG,"Exception levée"); }
-        }
-    };
-
-    private Runnable writter = new Runnable() {
-
-        @Override
-        public void run() {
-
-            Log.d(TAG,"Start Writter");
-            send.setVisibility(View.VISIBLE);
-            list.setVisibility(View.GONE);
-
-            sendButton = (Button)findViewById(R.id.sendButton);
-            editSend = (EditText)findViewById(R.id.editSend);
-
-            final String message = editSend.getText().toString();
-
-
-            Log.d(TAG,"Mise en place du listener");
-
-            for(int i = 0; i<200; i++)
-            {
-                try {
-                    os.write(i + "\n");
-                    os.flush();
-                    Thread.sleep(2000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            /*sendButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    try {
-                        os.write(message + "\n");
-                        os.flush();
-                        Thread.sleep(2000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });*/
-
+            mBluetoothConnection = (ConnectionThread) msg.obj;
+            data = "123456789";//(String) msg.obj;
+            superLog("Data :" + data);
+            Log.d(TAG, "Message envoyé");
+            mBluetoothConnection.write(data.getBytes());
         }
     };
 
@@ -173,11 +93,6 @@ public class MainActivity extends ActionBarActivity
             {
                 String beDiscoverable = BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE;
                 startActivityForResult(new Intent(beDiscoverable), 1);
-                listFoundAdapter.clear();
-
-                listFoundAdapter.add("Found\nmanger");
-                listFoundAdapter.add("Manger\nFound");
-                listFoundAdapter.add("Found\nFound");
             }
         });
 
@@ -185,23 +100,9 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onClick(View v) {
                 btAdapter.disable();
-                listFoundAdapter.clear();
             }
         });
 
-        listViewFound.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String manger = listFoundAdapter.getItem(position);
-                String[] leSplit;
-                leSplit = manger.split("\n");
-                name = leSplit[0];
-                address = leSplit[1];
-                logs.setText("this is a log :" + name + " + " + address);
-                Log.d(TAG,"Avant connexion");
-                new Thread(connexion).start();
-            }
-        });
     }
 
     private void initVariables()
@@ -209,21 +110,13 @@ public class MainActivity extends ActionBarActivity
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         bConnect = (Button)findViewById(R.id.bConnect);
         bDisconnect = (Button)findViewById(R.id.bDisconnect);
-        logs = (TextView)findViewById(R.id.textLog);
         bConnect.setVisibility(View.GONE);
         bDisconnect.setVisibility(View.GONE);
 
+        logs = (TextView)findViewById(R.id.textLog);
+
         send = (LinearLayout)findViewById(R.id.layoutSend);
-        list = (LinearLayout)findViewById(R.id.layoutList);
-        list.setVisibility(View.VISIBLE);
         send.setVisibility(View.GONE);
-
-
-        listFoundAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        listViewFound = (ListView)findViewById(R.id.listViewFound);
-        listViewFound.setAdapter(listFoundAdapter);
-
-        listViewFound.setVisibility(View.GONE);
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothState, filter);
@@ -237,13 +130,11 @@ public class MainActivity extends ActionBarActivity
         {
             bDisconnect.setVisibility(View.VISIBLE);
             bConnect.setVisibility(View.GONE);
-            listViewFound.setVisibility(View.VISIBLE);
         }
         else
         {
             bConnect.setVisibility(View.VISIBLE);
             bDisconnect.setVisibility(View.GONE);
-            listViewFound.setVisibility(View.GONE);
         }
         Log.d(TAG,"Buttons refreshed");
     }
@@ -255,6 +146,12 @@ public class MainActivity extends ActionBarActivity
         {
             tost("Starting Discovery");
             findDevices();
+
+            Log.d(TAG,"Run connexion");
+            send.setVisibility(View.VISIBLE);
+            superLog("Thread Lancé");
+
+            new AcceptThread(mHandler).start();
         }
         refreshButtons();
     }
@@ -271,6 +168,15 @@ public class MainActivity extends ActionBarActivity
     private void tost(String text)
     {
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    private void superLog(String log)
+    {
+        if(log!=null)
+        {
+            Log.d(TAG, log);
+            logs.setText(log);
+        }
     }
 }
 
