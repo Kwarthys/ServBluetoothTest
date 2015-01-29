@@ -56,6 +56,9 @@ public class ConnectionThread extends Thread {
                 Log.d("AVEC CONVERSION", value);
 
                 mHandler.obtainMessage(MainActivity.DATA_RECEIVED, value).sendToTarget();
+
+                Log.d("ConnecThread", "Handler mis a jours avec " + value);
+
             } catch (IOException e) {
                 break;
             }

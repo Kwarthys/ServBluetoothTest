@@ -61,15 +61,18 @@ class AcceptThread extends Thread {
     }
 
     private void manageConnectedSocket() {
+        Log.d("AcceptThread", "Manage du servSocket");
         ConnectionThread conn = new ConnectionThread(mBluetoothSocket, mHandler);
-        mHandler.obtainMessage(MainActivity.SOCKET_CONNECTED, conn)
-                .sendToTarget();
+        mHandler.obtainMessage(MainActivity.SOCKET_CONNECTED, conn).sendToTarget();
         conn.start();
+        Log.d("AcceptThread", "Manage du servSocket Done");
     }
 
     public void cancel() {
         try {
             if (null != mServerSocket) {
+
+                Log.d("AcceptThread", "Fermeture du servSocket");
                 mServerSocket.close();
             }
         } catch (IOException e) {

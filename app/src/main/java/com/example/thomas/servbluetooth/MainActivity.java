@@ -26,7 +26,6 @@ public class MainActivity extends ActionBarActivity
 
     public static final int SOCKET_CONNECTED = 4;
     public static final int DATA_RECEIVED = 3;
-    private String data;
 
     private ConnectionThread mBluetoothConnection = null;
 
@@ -61,11 +60,30 @@ public class MainActivity extends ActionBarActivity
         @Override
         public void handleMessage(Message msg)
         {
-            mBluetoothConnection = (ConnectionThread) msg.obj;
-            data = "123456789";//(String) msg.obj;
-            superLog("Data :" + data);
-            Log.d(TAG, "Message envoyé");
-            mBluetoothConnection.write(data.getBytes());
+            String data;
+            if (msg.what == SOCKET_CONNECTED)
+            {
+                mBluetoothConnection = (ConnectionThread) msg.obj;
+                Log.d(TAG, "Mise en place du OnClickListener");
+                sendButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Log.d(TAG, "Clic d'envoi");
+                        String message = editSend.getText().toString();
+                        mBluetoothConnection.write(message.getBytes());
+                        Log.d(TAG, "Envoi effectué");
+                    }
+                });
+            }
+            else if (msg.what == DATA_RECEIVED)
+            {
+                data = (String) msg.obj;
+                superLog("Data :" + data);
+                Log.d(TAG, "Message Reçu");
+            }
+
+
         }
     };
 
@@ -100,6 +118,7 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onClick(View v) {
                 btAdapter.disable();
+                send.setVisibility(View.GONE);
             }
         });
 
@@ -112,6 +131,8 @@ public class MainActivity extends ActionBarActivity
         bDisconnect = (Button)findViewById(R.id.bDisconnect);
         bConnect.setVisibility(View.GONE);
         bDisconnect.setVisibility(View.GONE);
+        sendButton = (Button)findViewById(R.id.sendButton);
+        editSend = (EditText)findViewById(R.id.editSend);
 
         logs = (TextView)findViewById(R.id.textLog);
 
