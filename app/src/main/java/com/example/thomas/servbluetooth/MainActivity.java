@@ -12,11 +12,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 //pwalpwalpwal
 
@@ -29,6 +35,11 @@ public class MainActivity extends ActionBarActivity
 
     private ConnectionThread mBluetoothConnection = null;
 
+    protected Spinner spinner = null;
+    protected ArrayAdapter<CharSequence> arraySpinner;
+    protected ListView listTrames = null;
+    protected ArrayAdapter<String> arrayList;
+
     protected Button bConnect = null;
     protected Button bDisconnect = null;
     protected Button sendButton = null;
@@ -37,6 +48,12 @@ public class MainActivity extends ActionBarActivity
     protected EditText editSend = null;
 
     protected LinearLayout send = null;
+
+    protected int vpan1 = 0;
+    protected int vpan2 = 0;
+    protected int vpan3 = 0;
+    protected int vpan4 = 0;
+    protected int vpan5 = 0;
 
     protected BroadcastReceiver bluetoothState = new BroadcastReceiver() {
         @Override
@@ -56,6 +73,19 @@ public class MainActivity extends ActionBarActivity
         }
     };
 
+    protected Handler tempoH = new Handler();
+    protected Runnable envoiTrames = new Runnable() {
+        @Override
+        public void run() {
+            String message = editSend.getText().toString();
+            mBluetoothConnection.write(message.getBytes());
+            Log.d(TAG, "Envoi effectué");
+
+
+            tempoH.postDelayed(this, 1000);
+        }
+    };
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg)
@@ -64,22 +94,12 @@ public class MainActivity extends ActionBarActivity
             if (msg.what == SOCKET_CONNECTED)
             {
                 mBluetoothConnection = (ConnectionThread) msg.obj;
-                Log.d(TAG, "Mise en place du OnClickListener");
-                sendButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Log.d(TAG, "Clic d'envoi");
-                        String message = editSend.getText().toString();
-                        mBluetoothConnection.write(message.getBytes());
-                        Log.d(TAG, "Envoi effectué");
-                    }
-                });
+                tempoH.postDelayed(envoiTrames,1000);
             }
             else if (msg.what == DATA_RECEIVED)
             {
                 data = (String) msg.obj;
-                superLog("Data :" + data);
+                superLog("Data : " + data);
                 Log.d(TAG, "Message Reçu");
             }
 
@@ -119,6 +139,7 @@ public class MainActivity extends ActionBarActivity
             public void onClick(View v) {
                 btAdapter.disable();
                 send.setVisibility(View.GONE);
+                tempoH.removeCallbacks(envoiTrames);
             }
         });
 
@@ -133,6 +154,16 @@ public class MainActivity extends ActionBarActivity
         bDisconnect.setVisibility(View.GONE);
         sendButton = (Button)findViewById(R.id.sendButton);
         editSend = (EditText)findViewById(R.id.editSend);
+
+        spinner = (Spinner)findViewById(R.id.spinner);
+        arraySpinner = ArrayAdapter.createFromResource(this,
+                R.array.IDTrames, android.R.layout.simple_spinner_item);
+        arraySpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arraySpinner);
+
+        listTrames = (ListView)findViewById(R.id.listTrames);
+        arrayList = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1,0);
+        listTrames.setAdapter(arrayList);
 
         logs = (TextView)findViewById(R.id.textLog);
 
@@ -199,6 +230,12 @@ public class MainActivity extends ActionBarActivity
             logs.setText(log);
         }
     }
+
+    /*private String getIDTrame(String nom)
+    {
+        switch nom:
+            case
+    }*/
 }
 
 //UUID 35ab00d3-22c4-41a0-9aba-bf6ad3271bce

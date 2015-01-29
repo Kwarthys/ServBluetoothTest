@@ -7,6 +7,14 @@
     <string name="Envoyer">Envoyer</string>
     <string name="Connecter">Connecter</string>
     <string name="Deconnecter">Déconnecter</string>
+    <string name="STOP">STOP</string>
     <string name="Found">Found :</string>
+    <string-array name="IDTrames">
+        <item>Panneau 1</item>
+        <item>Panneau 2</item>
+        <item>Panneau 3</item>
+        <item>Panneau 4</item>
+        <item>Panneau 5</item>
+    </string-array>
 
 </resources>
