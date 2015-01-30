@@ -12,13 +12,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,21 +39,23 @@ public class MainActivity extends ActionBarActivity
     protected ArrayAdapter<CharSequence> arraySpinner;
     protected ListView listTrames = null;
     protected ArrayAdapter<String> arrayList;
+    protected Switch switchSend = null;
+    protected Button bPlus = null;
+    protected Button bMoins = null;
+    protected LinearLayout layoutTrame = null;
+    protected LinearLayout layoutList = null;
+    protected TextView textValue = null;
 
     protected Button bConnect = null;
     protected Button bDisconnect = null;
-    protected Button sendButton = null;
     protected BluetoothAdapter btAdapter;
     protected TextView logs = null;
-    protected EditText editSend = null;
 
-    protected LinearLayout send = null;
-
-    protected int vpan1 = 0;
-    protected int vpan2 = 0;
-    protected int vpan3 = 0;
-    protected int vpan4 = 0;
-    protected int vpan5 = 0;
+    protected int vpan1 = 0; protected Boolean statePan1 = false;
+    protected int vpan2 = 0; protected Boolean statePan2 = false;
+    protected int vpan3 = 0; protected Boolean statePan3 = false;
+    protected int vpan4 = 0; protected Boolean statePan4 = false;
+    protected int vpan5 = 0; protected Boolean statePan5 = false;
 
     protected BroadcastReceiver bluetoothState = new BroadcastReceiver() {
         @Override
@@ -79,7 +81,7 @@ public class MainActivity extends ActionBarActivity
         public void run() {
             String message = getTrame(spinner.getSelectedItem().toString());
             mBluetoothConnection.write(message.getBytes());
-            Log.d(TAG, "Envoi effectué");
+            Log.d(TAG, "Envoi effectué" + message);
 
 
             tempoH.postDelayed(this, 1000);
@@ -138,8 +140,35 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onClick(View v) {
                 btAdapter.disable();
-                send.setVisibility(View.GONE);
+                layoutList.setVisibility(View.GONE);
+                layoutTrame.setVisibility(View.GONE);
                 tempoH.removeCallbacks(envoiTrames);
+            }
+        });
+
+        bPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changerTrame("PLUS");
+            }
+        });
+
+        bMoins.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changerTrame("MOINS");
+            }
+        });
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                refreshSpinner();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -152,8 +181,12 @@ public class MainActivity extends ActionBarActivity
         bDisconnect = (Button)findViewById(R.id.bDisconnect);
         bConnect.setVisibility(View.GONE);
         bDisconnect.setVisibility(View.GONE);
-        sendButton = (Button)findViewById(R.id.sendButton);
-        editSend = (EditText)findViewById(R.id.editSend);
+
+        textValue = (TextView)findViewById(R.id.textValue);
+
+        switchSend = (Switch)findViewById(R.id.switchSend);
+        bMoins = (Button)findViewById(R.id.buttonMoins);
+        bPlus = (Button)findViewById(R.id.buttonPlus);
 
         spinner = (Spinner)findViewById(R.id.spinner);
         arraySpinner = ArrayAdapter.createFromResource(this,
@@ -165,10 +198,12 @@ public class MainActivity extends ActionBarActivity
         arrayList = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1,0);
         listTrames.setAdapter(arrayList);
 
-        logs = (TextView)findViewById(R.id.textLog);
+        layoutList = (LinearLayout)findViewById(R.id.layoutList);
+        layoutTrame = (LinearLayout)findViewById(R.id.layoutTrame);
+        layoutList.setVisibility(View.GONE);
+        layoutTrame.setVisibility(View.GONE);
 
-        send = (LinearLayout)findViewById(R.id.layoutSend);
-        send.setVisibility(View.GONE);
+        logs = (TextView)findViewById(R.id.textLog);
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothState, filter);
@@ -199,8 +234,9 @@ public class MainActivity extends ActionBarActivity
             tost("Starting Discovery");
             findDevices();
 
-            Log.d(TAG,"Run connexion");
-            send.setVisibility(View.VISIBLE);
+            Log.d(TAG, "Run connexion");
+            layoutList.setVisibility(View.VISIBLE);
+            layoutTrame.setVisibility(View.VISIBLE);
             superLog("Thread Lancé");
 
             new AcceptThread(mHandler).start();
@@ -220,6 +256,36 @@ public class MainActivity extends ActionBarActivity
     private void tost(String text)
     {
         Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    private void refreshSpinner()
+    {
+        if (textValue!=null && switchSend!=null)
+        {
+            switch (spinner.getSelectedItem().toString()) {
+                case "Panneau 1":
+                    switchSend.setChecked(statePan1);
+                    textValue.setText(String.valueOf(vpan1));
+                    break;
+                case "Panneau 2":
+                    switchSend.setChecked(statePan2);
+                    textValue.setText(String.valueOf(vpan2));
+                    break;
+                case "Panneau 3":
+                    switchSend.setChecked(statePan3);
+                    textValue.setText(String.valueOf(vpan3));
+                    break;
+                case "Panneau 4":
+                    switchSend.setChecked(statePan4);
+                    textValue.setText(String.valueOf(vpan4));
+                    break;
+                case "Panneau 5":
+                    switchSend.setChecked(statePan5);
+                    textValue.setText(String.valueOf(vpan5));
+                    break;
+            }
+        }
+
     }
 
     private void superLog(String log)
@@ -253,6 +319,43 @@ public class MainActivity extends ActionBarActivity
             case "Panneau 5" : return "57" + zeros(String.valueOf(vpan5)) + vpan5 + "++";
         }
         return null;
+    }
+
+    private void changerTrame(String job)
+    {
+        int panMove;
+        if(job.equals("PLUS"))
+            panMove = 50;
+        else
+            panMove = -50;
+        switch (spinner.getSelectedItem().toString())
+        {
+            case "Panneau 1" : vpan1 += panMove;
+                if(vpan1 < 0)
+                    vpan1 = 0;
+                textValue.setText(String.valueOf(vpan1));
+                break;
+            case "Panneau 2" : vpan2 += panMove;
+                if(vpan1 < 0)
+                    vpan1 = 0;
+                textValue.setText(String.valueOf(vpan2));
+                break;
+            case "Panneau 3" : vpan3 += panMove;
+                if(vpan1 < 0)
+                    vpan1 = 0;
+                textValue.setText(String.valueOf(vpan3));
+                break;
+            case "Panneau 4" : vpan4 += panMove;
+                if(vpan1 < 0)
+                    vpan1 = 0;
+                textValue.setText(String.valueOf(vpan4));
+                break;
+            case "Panneau 5" : vpan5 += panMove;
+                if(vpan1 < 0)
+                    vpan1 = 0;
+                textValue.setText(String.valueOf(vpan5));
+                break;
+        }
     }
 }
 

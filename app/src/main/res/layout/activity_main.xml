@@ -38,15 +38,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/layoutButtons"
-            android:id="@+id/layoutfinal">
+            android:id="@+id/layoutTrame">
 
-            <Button
+            <Switch
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:textColor="#fff"
-                android:background="#000"
-                android:id="@+id/StopButton"
-                android:text="@string/STOP"/>
+                android:id="@+id/switchSend"/>
 
             <Spinner
                 android:layout_width="wrap_content"
@@ -83,25 +80,11 @@
         </LinearLayout>
     <LinearLayout
         android:gravity="center"
-        android:layout_below="@id/layoutfinal"
+        android:layout_below="@id/layoutTrame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/layoutSend"
+        android:id="@+id/layoutList"
         android:orientation="vertical">
-
-        <EditText
-            android:layout_width="fill_parent"
-            android:id="@+id/editSend"
-            android:inputType="text"
-            android:layout_height="wrap_content"
-            android:maxLength="8"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/Envoyer"
-            android:id="@+id/sendButton"/>
 
         <ListView
             android:layout_width="wrap_content"
