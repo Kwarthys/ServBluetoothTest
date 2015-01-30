@@ -79,11 +79,37 @@ public class MainActivity extends ActionBarActivity
     protected Runnable envoiTrames = new Runnable() {
         @Override
         public void run() {
-            String message = getTrame(spinner.getSelectedItem().toString());
-            mBluetoothConnection.write(message.getBytes());
-            Log.d(TAG, "Envoi effectué" + message);
 
-
+            if (statePan1)
+            {
+                String message = getTrame("Panneau 1");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (statePan2)
+            {
+                String message = getTrame("Panneau 2");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (statePan3)
+            {
+                String message = getTrame("Panneau 3");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (statePan4)
+            {
+                String message = getTrame("Panneau 4");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (statePan5)
+            {
+                String message = getTrame("Panneau 5");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
             tempoH.postDelayed(this, 1000);
         }
     };
@@ -172,6 +198,13 @@ public class MainActivity extends ActionBarActivity
             }
         });
 
+        switchSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateStates();
+            }
+        });
+
     }
 
     private void initVariables()
@@ -207,6 +240,34 @@ public class MainActivity extends ActionBarActivity
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothState, filter);
+    }
+
+    private void updateStates()
+    {
+        switch (spinner.getSelectedItem().toString())
+        {
+            case "Panneau 1" : statePan1 = switchSend.isChecked(); break;
+            case "Panneau 2" : statePan2 = switchSend.isChecked(); break;
+            case "Panneau 3" : statePan3 = switchSend.isChecked(); break;
+            case "Panneau 4" : statePan4 = switchSend.isChecked(); break;
+            case "Panneau 5" : statePan5 = switchSend.isChecked(); break;
+        }
+        updateListe();
+
+    }
+    private void updateListe()
+    {
+        arrayList.clear();
+        if(statePan1)
+            arrayList.add("Panneau 1");
+        if(statePan2)
+            arrayList.add("Panneau 2");
+        if(statePan3)
+            arrayList.add("Panneau 3");
+        if(statePan4)
+            arrayList.add("Panneau 4");
+        if(statePan5)
+            arrayList.add("Panneau 5");
     }
 
     private void refreshButtons()
