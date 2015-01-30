@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity
     protected Runnable envoiTrames = new Runnable() {
         @Override
         public void run() {
-            String message = editSend.getText().toString();
+            String message = getTrame(spinner.getSelectedItem().toString());
             mBluetoothConnection.write(message.getBytes());
             Log.d(TAG, "Envoi effectué");
 
@@ -231,11 +231,29 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    /*private String getIDTrame(String nom)
+    private String zeros(String manger)
     {
-        switch nom:
-            case
-    }*/
+        String zeros = "";
+        int taille = manger.length();
+        int truc = 4 - taille;
+        for(int i = 0; i< truc ; i++)
+            zeros += "0";
+        return zeros;
+    }
+
+
+    private String getTrame(String nom)
+    {
+        switch (nom)
+        {
+            case "Panneau 1" : return "52" + zeros(String.valueOf(vpan1)) + vpan1 + "++";
+            case "Panneau 2" : return "51" + zeros(String.valueOf(vpan2)) + vpan2 + "++";
+            case "Panneau 3" : return "53" + zeros(String.valueOf(vpan3)) + vpan3 + "++";
+            case "Panneau 4" : return "56" + zeros(String.valueOf(vpan4)) + vpan4 + "++";
+            case "Panneau 5" : return "57" + zeros(String.valueOf(vpan5)) + vpan5 + "++";
+        }
+        return null;
+    }
 }
 
 //UUID 35ab00d3-22c4-41a0-9aba-bf6ad3271bce
