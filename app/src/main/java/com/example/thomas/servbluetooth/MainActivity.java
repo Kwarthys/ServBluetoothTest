@@ -51,11 +51,15 @@ public class MainActivity extends ActionBarActivity
     protected BluetoothAdapter btAdapter;
     protected TextView logs = null;
 
-    protected int vpan1 = 0; protected Boolean statePan1 = false;
-    protected int vpan2 = 0; protected Boolean statePan2 = false;
-    protected int vpan3 = 0; protected Boolean statePan3 = false;
-    protected int vpan4 = 0; protected Boolean statePan4 = false;
-    protected int vpan5 = 0; protected Boolean statePan5 = false;
+    protected int vpan1 = 0; protected Boolean statePan1 = false; String idPan1 = "52";
+    protected int vpan2 = 0; protected Boolean statePan2 = false; String idPan2 = "51";
+    protected int vpan3 = 0; protected Boolean statePan3 = false; String idPan3 = "53";
+    protected int vpan4 = 0; protected Boolean statePan4 = false; String idPan4 = "56";
+    protected int vpan5 = 0; protected Boolean statePan5 = false; String idPan5 = "57";
+    protected int vpanGlobal = 0; protected Boolean statePanGlobal = false; String idPanGlobal = "58";
+    protected int vTpanAvant = 0; protected Boolean stateTpanAvant = false; String idTpanAvant = "11";
+    protected int vTpanMillieu = 0; protected Boolean stateTpanMillieu = false; String idTpanMillieu = "12";
+    protected int vTpanArrière = 0; protected Boolean stateTpanArrière = false; String idTpanArrière = "13";
 
     protected BroadcastReceiver bluetoothState = new BroadcastReceiver() {
         @Override
@@ -107,6 +111,30 @@ public class MainActivity extends ActionBarActivity
             if (statePan5)
             {
                 String message = getTrame("Panneau 5");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (statePanGlobal)
+            {
+                String message = getTrame("Panneau Global");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (stateTpanMillieu)
+            {
+                String message = getTrame("T pan Millieu");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (stateTpanArrière)
+            {
+                String message = getTrame("T pan Arrière");
+                mBluetoothConnection.write(message.getBytes());
+                Log.d(TAG, "Envoi effectué" + message);
+            }
+            if (stateTpanAvant)
+            {
+                String message = getTrame("T pan Avant");
                 mBluetoothConnection.write(message.getBytes());
                 Log.d(TAG, "Envoi effectué" + message);
             }
@@ -251,6 +279,10 @@ public class MainActivity extends ActionBarActivity
             case "Panneau 3" : statePan3 = switchSend.isChecked(); break;
             case "Panneau 4" : statePan4 = switchSend.isChecked(); break;
             case "Panneau 5" : statePan5 = switchSend.isChecked(); break;
+            case "Panneau Global" : statePanGlobal = switchSend.isChecked(); break;
+            case "T pan Avant" : stateTpanAvant = switchSend.isChecked(); break;
+            case "T pan Arrière" : stateTpanArrière= switchSend.isChecked(); break;
+            case "T pan Millieu" : stateTpanMillieu = switchSend.isChecked(); break;
         }
         updateListe();
 
@@ -268,6 +300,14 @@ public class MainActivity extends ActionBarActivity
             arrayList.add("Panneau 4");
         if(statePan5)
             arrayList.add("Panneau 5");
+        if(statePanGlobal)
+            arrayList.add("Panneau Global");
+        if(stateTpanArrière)
+            arrayList.add("T pan Arrière");
+        if(stateTpanAvant)
+            arrayList.add("T pan Avant");
+        if(stateTpanMillieu)
+            arrayList.add("T pan Millieu");
     }
 
     private void refreshButtons()
@@ -344,6 +384,22 @@ public class MainActivity extends ActionBarActivity
                     switchSend.setChecked(statePan5);
                     textValue.setText(String.valueOf(vpan5));
                     break;
+                case "Panneau Global":
+                    switchSend.setChecked(statePanGlobal);
+                    textValue.setText(String.valueOf(vpanGlobal));
+                    break;
+                case "T pan Avant":
+                    switchSend.setChecked(stateTpanAvant);
+                    textValue.setText(String.valueOf(vTpanAvant));
+                    break;
+                case "T pan Arrière":
+                    switchSend.setChecked(stateTpanArrière);
+                    textValue.setText(String.valueOf(vTpanArrière));
+                    break;
+                case "T pan Millieu":
+                    switchSend.setChecked(stateTpanMillieu);
+                    textValue.setText(String.valueOf(vTpanMillieu));
+                    break;
             }
         }
 
@@ -373,11 +429,15 @@ public class MainActivity extends ActionBarActivity
     {
         switch (nom)
         {
-            case "Panneau 1" : return "52" + zeros(String.valueOf(vpan1)) + vpan1 + "++";
-            case "Panneau 2" : return "51" + zeros(String.valueOf(vpan2)) + vpan2 + "++";
-            case "Panneau 3" : return "53" + zeros(String.valueOf(vpan3)) + vpan3 + "++";
-            case "Panneau 4" : return "56" + zeros(String.valueOf(vpan4)) + vpan4 + "++";
-            case "Panneau 5" : return "57" + zeros(String.valueOf(vpan5)) + vpan5 + "++";
+            case "Panneau 1" : return idPan1 + zeros(String.valueOf(vpan1)) + vpan1 + "++";
+            case "Panneau 2" : return idPan2 + zeros(String.valueOf(vpan2)) + vpan2 + "++";
+            case "Panneau 3" : return idPan3 + zeros(String.valueOf(vpan3)) + vpan3 + "++";
+            case "Panneau 4" : return idPan4 + zeros(String.valueOf(vpan4)) + vpan4 + "++";
+            case "Panneau 5" : return idPan5 + zeros(String.valueOf(vpan5)) + vpan5 + "++";
+            case "Panneau Global" : return idPanGlobal + zeros(String.valueOf(vpanGlobal)) + vpanGlobal + "++";
+            case "T pan Avant" : return idTpanAvant + zeros(String.valueOf(vTpanAvant)) + vTpanAvant + "++";
+            case "T pan Arrière" : return idTpanArrière + zeros(String.valueOf(vTpanArrière)) + vTpanArrière + "++";
+            case "T pan Millieu" : return idTpanMillieu + zeros(String.valueOf(vTpanMillieu)) + vTpanMillieu + "++";
         }
         return null;
     }
@@ -397,24 +457,44 @@ public class MainActivity extends ActionBarActivity
                 textValue.setText(String.valueOf(vpan1));
                 break;
             case "Panneau 2" : vpan2 += panMove;
-                if(vpan1 < 0)
-                    vpan1 = 0;
+                if(vpan2 < 0)
+                    vpan2 = 0;
                 textValue.setText(String.valueOf(vpan2));
                 break;
             case "Panneau 3" : vpan3 += panMove;
-                if(vpan1 < 0)
-                    vpan1 = 0;
+                if(vpan3 < 0)
+                    vpan3 = 0;
                 textValue.setText(String.valueOf(vpan3));
                 break;
             case "Panneau 4" : vpan4 += panMove;
-                if(vpan1 < 0)
-                    vpan1 = 0;
+                if(vpan4 < 0)
+                    vpan4 = 0;
                 textValue.setText(String.valueOf(vpan4));
                 break;
             case "Panneau 5" : vpan5 += panMove;
-                if(vpan1 < 0)
-                    vpan1 = 0;
+                if(vpan5 < 0)
+                    vpan5 = 0;
                 textValue.setText(String.valueOf(vpan5));
+                break;
+            case "Panneau Global" : vpanGlobal += panMove;
+                if(vpanGlobal < 0)
+                    vpanGlobal = 0;
+                textValue.setText(String.valueOf(vpanGlobal));
+                break;
+            case "T pan Avant" : vTpanAvant += panMove;
+                if(vTpanAvant < 0)
+                    vTpanAvant = 0;
+                textValue.setText(String.valueOf(vTpanAvant));
+                break;
+            case "T pan Arrière" : vTpanArrière += panMove;
+                if(vTpanArrière < 0)
+                    vTpanArrière = 0;
+                textValue.setText(String.valueOf(vTpanArrière));
+                break;
+            case "T pan Millieu" : vTpanMillieu += panMove;
+                if(vTpanMillieu < 0)
+                    vTpanMillieu = 0;
+                textValue.setText(String.valueOf(vTpanMillieu));
                 break;
         }
     }

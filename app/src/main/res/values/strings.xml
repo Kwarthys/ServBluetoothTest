@@ -15,6 +15,10 @@
         <item>Panneau 3</item>
         <item>Panneau 4</item>
         <item>Panneau 5</item>
+        <item>Panneau Global</item>
+        <item>T pan Avant</item>
+        <item>T pan Arrière</item>
+        <item>T pan Millieu</item>
     </string-array>
 
 </resources>
